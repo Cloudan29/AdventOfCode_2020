@@ -18,27 +18,6 @@ class Graph:
     def add_vertex(self, vertex):
         self.adj_list.append(vertex)
 
-    def count_paths(self, source, destination):
-        visited = [False] * len(self.adj_list)
-
-        path_count = [0]
-        self.count_paths_util(source, destination, visited, path_count)
-        return path_count[0]
-
-    def count_paths_util(self, current_vertex, destination, visited, path_count):
-        visited[current_vertex] = True
-      
-        if current_vertex == destination:
-            path_count[0] += 1
-        else:
-            i = 0
-            while i < len(self.adj_list[current_vertex]): 
-                if not visited[self.adj_list[current_vertex][i]]:  
-                    self.count_paths_util(self.adj_list[current_vertex][i], destination, visited, path_count)
-                i += 1
-      
-        visited[current_vertex] = False
-
     def __repr__(self):
         return str(self.adj_list)
 
@@ -71,7 +50,21 @@ def part2():
             graph.add_vertex(new_edges)
             current_vertex += 1
 
-    return graph.count_paths(0, len(graph.adj_list) - 1)
+    # Get the number of edges at each vertex
+    num_of_edges = [len(graph.adj_list[i]) for i in range(len(graph.adj_list))]
+
+    # Start from the second to last edge
+    for i in range(len(graph.adj_list)-2, 0, -1):
+        for j in range(1, 4):
+            # If the current vertex is in a previous vertex
+            if i-j >= 0 and i in graph.adj_list[i-j]:
+                # Increase the number of edges in the previous vertex
+                num_of_edges[i-j] += num_of_edges[i]
+                # Remove an edge (because we're essentially doing a substitution)
+                num_of_edges[i-j] -= 1
+                
+
+    return num_of_edges[0]
 
 
 print (part1())
